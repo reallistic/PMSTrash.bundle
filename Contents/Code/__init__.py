@@ -40,8 +40,8 @@ def MainMenu(view_group="InfoList"):
        summary = "Check the trash for section %s" % title
        if type == "show":
            dir.add(DirectoryObject(key=Callback(ViewTvTrash, title=title, key=key), title=title, summary=summary, thumb=R(ICON), art=R(ART)))
-       #elif type == "artist":
-       #    dir.Append(DirectoryObject(key=Callback(ViewMusicTrash, title=title, key=key), title=title, summary=summary, thumb=R(ICON), art=R(ART))))
+       elif type == "artist":
+           dir.add(DirectoryObject(key=Callback(ViewMusicTrash, title=title, key=key), title=title, summary=summary, thumb=R(ICON), art=R(ART)))
        elif type == "movie":
            dir.add(DirectoryObject(key=Callback(ViewMovieTrash, title=title, key=key), title=title, summary=summary, thumb=R(ICON), art=R(ART)))
        else:
@@ -100,6 +100,40 @@ def ViewTvTrash(title, key):
            trashskey = trashseason.get('key')
            trashstitle = trashseason.get('title')
            trasheps = XML.ElementFromURL(GetBasePmsHost() + trashskey, errors='ignore').xpath('//Video[@deletedAt]')
+           Log("[debug] Requesting - %s" % GetBasePmsHost() + trashskey)
+           for trashep in trasheps:
+               trasheptitle = trashep.get('title')
+               trashepkey = trashep.get('key')
+               trashepsumm = trashep.get('summary')
+               trashepthumb = trashep.get('thumb')
+               Log("[debug] Adding - %s" % trasheptitle)
+               dirtitle = trashtitle + " - " + trashstitle + " - " + trasheptitle
+               dir.add(DirectoryObject(key=trashepkey, title=dirtitle, summary=trashepsumm,
+                  thumb=Resource.ContentsOfURLWithFallback(url=trashepthumb, fallback=R(ICON))))
+
+    #except:
+    #  Log("[debug] Error in for loop")
+    #  dir.header = title + ' trash empty'
+    #  dir.message = 'Error - Trash for section [' + title + '] is empty'
+ 
+   return dir
+
+####################################################################################################
+@route(PREFIX + '/MusicTrash')
+def ViewMusicTrash(title, key):
+   dir = ObjectContainer(title2="Music Trash", no_cache=True)
+    #try:
+   trashvideos = XML.ElementFromURL(GetPmsHost() + key + '/all', errors='ignore').xpath('//Directory[@deletedAt]')
+   for trashvideo in trashvideos:
+       trashkey = trashvideo.get('key')
+       trashtitle = trashvideo.get('title')
+       Log("Found Artist %s" % trashtitle)
+       trashseasons = XML.ElementFromURL(GetBasePmsHost() + trashkey, errors='ignore').xpath('//Directory[@deletedAt]')
+       Log("[debug] Requesting - %s" % GetBasePmsHost() + trashkey)
+       for trashseason in trashseasons:
+           trashskey = trashseason.get('key')
+           trashstitle = trashseason.get('title')
+           trasheps = XML.ElementFromURL(GetBasePmsHost() + trashskey, errors='ignore').xpath('//Track[@deletedAt]')
            Log("[debug] Requesting - %s" % GetBasePmsHost() + trashskey)
            for trashep in trasheps:
                trasheptitle = trashep.get('title')
