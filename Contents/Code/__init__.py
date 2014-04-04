@@ -99,9 +99,12 @@ def ViewTvTrash(title, key):
        for trashseason in trashseasons:
            trashskey = trashseason.get('key')
            trashstitle = trashseason.get('title')
-           trasheps = XML.ElementFromURL(GetBasePmsHost() + trashskey, errors='ignore').xpath('//Video[@deletedAt]')
+           #trasheps = XML.ElementFromURL(GetBasePmsHost() + trashskey, errors='ignore').xpath('//Video[@deletedAt]')
+           trasheps = XML.ElementFromURL(GetBasePmsHost() + trashskey, errors='ignore').xpath('//Video')
            Log("[debug] Requesting - %s" % GetBasePmsHost() + trashskey)
            for trashep in trasheps:
+               if len(trashep.xpath('./Media[@deletedAt]')) == 0 and len(trashep.xpath('.[@deletedAt]')) ==0:
+                  continue
                trasheptitle = trashep.get('title')
                trashepkey = trashep.get('key')
                trashepsumm = trashep.get('summary')
@@ -133,9 +136,11 @@ def ViewMusicTrash(title, key):
        for trashseason in trashseasons:
            trashskey = trashseason.get('key')
            trashstitle = trashseason.get('title')
-           trasheps = XML.ElementFromURL(GetBasePmsHost() + trashskey, errors='ignore').xpath('//Track[@deletedAt]')
+           trasheps = XML.ElementFromURL(GetBasePmsHost() + trashskey, errors='ignore').xpath('//Track')
            Log("[debug] Requesting - %s" % GetBasePmsHost() + trashskey)
            for trashep in trasheps:
+               if len(trashep.xpath('./Media[@deletedAt]')) == 0 and len(trashep.xpath('.[@deletedAt]')) ==0:
+                  continue
                trasheptitle = trashep.get('title')
                trashepkey = trashep.get('key')
                trashepsumm = trashep.get('summary')
