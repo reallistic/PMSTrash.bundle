@@ -113,7 +113,8 @@ def ViewTvTrash(title, key):
                dirtitle = trashtitle + " - " + trashstitle + " - " + trasheptitle
                dir.add(DirectoryObject(key=trashepkey, title=dirtitle, summary=trashepsumm,
                   thumb=Resource.ContentsOfURLWithFallback(url=trashepthumb, fallback=R(ICON))))
-
+   if len(dir) == 0:
+      dir.add(DirectoryObject(key=Callback(DirectoryEmpty), title="Empty", summary="There are no items to display", thumb=R(ICON)))
     #except:
     #  Log("[debug] Error in for loop")
     #  dir.header = title + ' trash empty'
@@ -139,17 +140,22 @@ def ViewMusicTrash(title, key):
            trasheps = XML.ElementFromURL(GetBasePmsHost() + trashskey, errors='ignore').xpath('//Track')
            Log("[debug] Requesting - %s" % GetBasePmsHost() + trashskey)
            for trashep in trasheps:
-               if len(trashep.xpath('./Media[@deletedAt]')) == 0 and len(trashep.xpath('.[@deletedAt]')) ==0:
-                  continue
-               trasheptitle = trashep.get('title')
-               trashepkey = trashep.get('key')
-               trashepsumm = trashep.get('summary')
-               trashepthumb = trashep.get('thumb')
-               Log("[debug] Adding - %s" % trasheptitle)
-               dirtitle = trashtitle + " - " + trashstitle + " - " + trasheptitle
-               dir.add(DirectoryObject(key=trashepkey, title=dirtitle, summary=trashepsumm,
-                  thumb=Resource.ContentsOfURLWithFallback(url=trashepthumb, fallback=R(ICON))))
+               try:
+                  deldate = trashep.get("deletedAt")
+               except:
+                  deldate = None
 
+               if deldate != None or len(trashep.xpath('./Media[@deletedAt]')) > 0:
+                  trasheptitle = trashep.get('title')
+                  trashepkey = trashep.get('key')
+                  trashepsumm = trashep.get('summary')
+                  trashepthumb = trashep.get('thumb')
+                  Log("[debug] Adding - %s" % trasheptitle)
+                  dirtitle = trashtitle + " - " + trashstitle + " - " + trasheptitle
+                  dir.add(DirectoryObject(key=trashepkey, title=dirtitle, summary=trashepsumm,
+                     thumb=Resource.ContentsOfURLWithFallback(url=trashepthumb, fallback=R(ICON))))
+   if len(dir) == 0:
+      dir.add(DirectoryObject(key=Callback(DirectoryEmpty), title="Empty", summary="There are no items to display", thumb=R(ICON)))
     #except:
     #  Log("[debug] Error in for loop")
     #  dir.header = title + ' trash empty'
@@ -167,6 +173,16 @@ def NotAvailable():
     return MessageContainer(
         "Not Available",
         "This type of section is not yet implemented"
+    )
+####################################################################################################
+
+def DirectoryEmpty():
+    ## you might want to try making me return a MediaContainer
+    ## containing a list of DirectoryItems to see what happens =)
+
+    return MessageContainer(
+        "This is empty",
+        "There are no items to display here"
     )
 
 ####################################################################################################
