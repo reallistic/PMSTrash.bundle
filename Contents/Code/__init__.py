@@ -103,7 +103,7 @@ def ViewTvTrash(title, key):
            trasheps = XML.ElementFromURL(GetBasePmsHost() + trashskey, errors='ignore').xpath('//Video')
            Log("[debug] Requesting - %s" % GetBasePmsHost() + trashskey)
            for trashep in trasheps:
-               if len(trashep.xpath('./Media[@deletedAt]')) == 0 and len(trashep.xpath('.[@deletedAt]')) ==0:
+               if len(trashep.xpath('./Media[@deletedAt]')) == 0 and len(trashep.xpath('./[@deletedAt]')) == 0:
                   continue
                trasheptitle = trashep.get('title')
                trashepkey = trashep.get('key')
